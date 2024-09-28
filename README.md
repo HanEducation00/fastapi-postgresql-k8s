@@ -1,86 +1,139 @@
 - How to use fastapi, postgresql and kubernetes.
 
-### 1. Deploy yaml filess. 
-
-
-#### a. Postgresql Deployment
-
-- You should be careful that firstly, pvc.yaml have to run than postgres-deployment.yaml file should be deployed.
-
-```
-kubectl apply -f postgres-pvc.yaml
-```
-
-```
-kubectl get pods
-```
-
-```
-kubectl get deployments
-```
-
-```
-kubectl apply -f postgres-deployment.yaml
-```
-- Check the pods !
-
-```
-kubectl apply -f postgres-service.yaml
-```
-
-#### b. Fastapi Deployment
-
-```
-kubectl apply -f fastapi-deployment.yaml
-```
-
-```
-kubectl apply -f fastapi-service.yaml
-```  
+### 1. Jenkinsfile
 
 ``` 
-kubectl get services
-``` 
+pipeline {
+    agent any
 
-#### c. Ingress Deployment
+    triggers {
+        githubPush()
+    }
+
+    environment {
+        DOCKER_IMAGE = 'hanoguz00/fastapi-app'
+        DOCKER_TAG = 'latest'
+        FASTAPI_DEPLOYMENT_FILE = 'fastapi-deployment.yaml'
+        FASTAPI_SERVICE_FILE = 'fastapi-service.yaml'
+        POSTGRES_DEPLOYMENT_FILE = 'postgres-deployment.yaml'
+        POSTGRES_SERVICE_FILE = 'postgres-service.yaml'
+        POSTGRES_PVC_FILE = 'postgres-pvc.yaml'
+        INGRESS_FILE = 'ingress.yaml'
+        NAMESPACE = 'default'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/KuserOguzHan/pipeline_postgresql_1.git'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                script {
+                    echo 'Logging into Docker Hub...'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo 'Building Docker image...'
+                    sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                }
+            }
+        }
+
+        stage('Push Docker Image to Hub') {
+            steps {
+                script {
+                    echo 'Pushing Docker image to Docker Hub...'
+                    sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
+                }
+            }
+        }
+
+        stage('Deploy PostgreSQL') {
+            steps {
+                script {
+                    echo 'Deploying PostgreSQL...'
+                    sh 'kubectl --kubeconfig=$KUBE_CONFIG apply -f $POSTGRES_PVC_FILE -n $NAMESPACE'
+                    sh 'kubectl --kubeconfig=$KUBE_CONFIG apply -f $POSTGRES_DEPLOYMENT_FILE -n $NAMESPACE'
+                    sh 'kubectl --kubeconfig=$KUBE_CONFIG apply -f $POSTGRES_SERVICE_FILE -n $NAMESPACE'
+                }
+            }
+        }
+
+        stage('Check PostgreSQL Deployment Status') {
+            steps {
+                script {
+                    echo 'Checking PostgreSQL deployment status...'
+                    sh 'kubectl get pods -n $NAMESPACE'
+                    sh 'kubectl get services -n $NAMESPACE'
+                }
+            }
+        }
+
+        stage('Deploy FastAPI App') {
+            steps {
+                script {
+                    echo 'Deploying FastAPI application...'
+                    sh 'kubectl --kubeconfig=$KUBE_CONFIG apply -f $FASTAPI_DEPLOYMENT_FILE -n $NAMESPACE'
+                    sh 'kubectl --kubeconfig=$KUBE_CONFIG apply -f $FASTAPI_SERVICE_FILE -n $NAMESPACE'
+                }
+            }
+        }
+
+        stage('Check FastAPI Deployment Status') {
+            steps {
+                script {
+                    echo 'Checking FastAPI deployment status...'
+                    sh 'kubectl get pods -n $NAMESPACE'
+                    sh 'kubectl get services -n $NAMESPACE'
+                }
+            }
+        }
+
+        stage('Deploy Ingress') {
+            steps {
+                script {
+                    echo 'Deploying Ingress for FastAPI application...'
+                    sh 'kubectl --kubeconfig=$KUBE_CONFIG apply -f $INGRESS_FILE -n $NAMESPACE'
+                }
+            }
+        }
+
+        stage('Check Ingress Status') {
+            steps {
+                script {
+                    echo 'Checking Ingress status...'
+                    sh 'kubectl get ingress -n $NAMESPACE'
+                }
+            }
+        }
+
+        stage('Access FastAPI Service via Minikube') {
+            when {
+                expression {
+                    return sh(script: 'minikube status', returnStatus: true) == 0
+                }
+            }
+            steps {
+                script {
+                    echo 'Accessing FastAPI service using Minikube...'
+                    sh 'minikube service fastapi -n $NAMESPACE'
+                }
+            }
+        }
+    }
+}
 
 ``` 
-kubectl apply -f ingress.yaml
-``` 
-
-``` 
-kubectl get ingress
-``` 
-
-``` 
-minikube addons enable ingress
-``` 
-
-``` 
-kubectl get pods -n ingress-nginx
-``` 
-
-``` 
-minikube service --all
-``` 
-
-### 2. Minikube Arrange
-
-``` 
-minikube ip
-``` 
-
-``` 
-sudo nano /etc/hosts
-``` 
-
-- Press Ctrl + O (Write), then Enter (Confirm) to save changes and Ctrl + X (Exit) to exit.
-
-
-``` 
-192.168.49.2    yourdomain.com
-``` 
-
 
 ### 2. Connect Databese
 
@@ -185,62 +238,6 @@ iPhone,64.0,4.0,6.1,3110.0,12.0,12.0,12.0,0.0,0.0,11.199
 }
 ```
 
-
-### 5. Delete
-
-#### 
-```
-kubectl get deployments
-```
-
-```
-kubectl delete deployment <deployment-name>
-```
-
-#### 
-```
-kubectl get services
-```
-
-```
-kubectl delete service <service-name>
-```
-
-#### 
-```
-kubectl get pods
-```
-
-```
-kubectl delete pod <pod-name>
-```
-
-#### 
-```
-kubectl get ingress
-```
-
-```
-kubectl delete ingress <ingress-name>
-``` 
-
-#### 
-```
-kubectl get pvc
-```
-
-```
-kubectl delete pvc <pvc-name>
-```
-
-#### 
-```
-kubectl get pv
-```
-
-```
-kubectl delete pv <pv-name>
-```
 
 
 
