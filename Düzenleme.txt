@@ -155,21 +155,20 @@ pipeline {
 pipeline_postgresql_1
 │
 ├
-├── test/
+k8s.test/
 │   ├── fastapi-deployment-test.yaml
 │   ├── fastapi-service-test.yaml
-│   ├── postgres-deployment-test.yaml
 │   ├── postgres-service-test.yaml
 │   └── postgres-pvc-test.yaml
     └── ingress-test.yaml
 k8s.prod/
 │   ├── fastapi-deployment-prod.yaml
 │   ├── fastapi-service-prod.yaml
-│   ├── postgres-deployment-prod.yaml
+    ├── postgres-service-prod.yaml
 │   ├── postgres-service-prod.yaml
 │   └── postgres-pvc-prod.yaml
     └── ingress-prod.yaml
-k8s.app
+k8s.app/
 │   ├── fastapi-deployment.yaml
 │   ├── fastapi-service.yaml
 │   ├── postgres-deployment.yaml
@@ -181,3 +180,5 @@ database.py
 docker-compose.yaml
 dockerfile
 README.md
+
+
