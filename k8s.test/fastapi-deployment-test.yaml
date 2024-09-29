@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: hanoguz00/fastapi-app:test  # Test ortamı için test tag'li imaj
+          image: hanoguz00/fastapi-app:latest   # Test ortamı için test tag'li imaj
           ports:
             - containerPort: 8000
           env:
