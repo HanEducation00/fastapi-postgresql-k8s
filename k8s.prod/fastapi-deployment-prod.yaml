@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-prod
+  name: fastapi
   namespace: prod
 spec:
-  replicas: 1  # Prod ortamında daha fazla replikalar
+  replicas: 1
   selector:
     matchLabels:
-      app: fastapi-prod
+      app: fastapi
   template:
     metadata:
       labels:
-        app: fastapi-prod
+        app: fastapi
     spec:
       containers:
         - name: fastapi
-          image: hanoguz00/fastapi-app:latest  # Prod ortamı için latest imaj
+          image: hanoguz00/fastapi-app:latest
           ports:
             - containerPort: 8000
           env:
             - name: SQLALCHEMY_DATABASE_URL
-              value: "postgresql://postgres:postgres@postgres/postgres"
+              value: "postgresql://postgres:postgres@postgres.prod.svc.cluster.local/postgres"

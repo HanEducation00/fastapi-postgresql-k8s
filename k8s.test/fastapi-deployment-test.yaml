@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-test
+  name: fastapi
   namespace: test
 spec:
-  replicas: 1  # Test ortamında düşük replikalar
+  replicas: 1
   selector:
     matchLabels:
-      app: fastapi-test
+      app: fastapi
   template:
     metadata:
       labels:
-        app: fastapi-test
+        app: fastapi
     spec:
       containers:
         - name: fastapi
-          image: hanoguz00/fastapi-app:latest   # Test ortamı için test tag'li imaj
+          image: hanoguz00/fastapi-app:latest
           ports:
             - containerPort: 8000
           env:
             - name: SQLALCHEMY_DATABASE_URL
-              value: "postgresql://postgres:postgres@postgres/postgres"
+              value: "postgresql://postgres:postgres@postgres.test.svc.cluster.local/postgres"

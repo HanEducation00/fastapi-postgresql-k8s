@@ -1,16 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-test
+  name: postgres
+  namespace: test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres-test
+      app: postgres
   template:
     metadata:
       labels:
-        app: postgres-test
+        app: postgres
     spec:
       containers:
         - name: postgres
@@ -21,7 +22,7 @@ spec:
             - name: POSTGRES_PASSWORD
               value: postgres
             - name: POSTGRES_DB
-              value: postgres_test
+              value: postgres
           ports:
             - containerPort: 5432
           volumeMounts:
@@ -30,4 +31,4 @@ spec:
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
-            claimName: postgres-pvc-test
+            claimName: postgres-pvc
