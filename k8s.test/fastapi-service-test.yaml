@@ -4,9 +4,8 @@ metadata:
   name: fastapi-test
   namespace: test
 spec:
-  type: NodePort  # veya LoadBalancer
   ports:
     - port: 80
-      targetPort: 8000  # FastAPI uygulamanızın çalıştığı port
+      targetPort: 8000
   selector:
     app: fastapi-test
