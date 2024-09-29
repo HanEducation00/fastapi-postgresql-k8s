@@ -4,7 +4,7 @@ metadata:
   name: fastapi-prod
   namespace: prod
 spec:
-  replicas: 3  # Prod ortamında daha fazla replikalar
+  replicas: 1  # Prod ortamında daha fazla replikalar
   selector:
     matchLabels:
       app: fastapi-prod
