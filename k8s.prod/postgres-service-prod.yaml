@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: postgres-prod  # Update this to postgres-prod
   namespace: prod
 spec:
   ports:
     - port: 5432
   selector:
     app: postgres
+  clusterIP: None
+

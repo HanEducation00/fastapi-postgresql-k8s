@@ -20,4 +20,4 @@ spec:
             - containerPort: 8000
           env:
             - name: SQLALCHEMY_DATABASE_URL
-              value: "postgresql://postgres:postgres@postgres-prod/postgres"
+              value: "postgresql://postgres:postgres@postgres/postgres"
