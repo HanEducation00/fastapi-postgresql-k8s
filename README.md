@@ -1,6 +1,41 @@
 - How to use fastapi, postgresql and kubernetes.
 
-### 1. Jenkinsfile
+
+### 1. File 
+
+```
+pipeline_postgresql_1
+│
+│
+k8s.test/
+│   ├── fastapi-deployment-test.yaml
+│   ├── fastapi-service-test.yaml
+│   ├── postgres-deployment-test.yaml
+│   ├── postgres-service-test.yaml
+│   └── postgres-pvc-test.yaml
+│   └── ingress-test.yaml
+k8s.prod/
+│   ├── fastapi-deployment-prod.yaml
+│   ├── fastapi-service-prod.yaml
+│   ├── postgres-deployment-prod.yaml
+│   ├── postgres-service-prod.yaml
+│   └── postgres-pvc-prod.yaml
+│   └── ingress-prod.yaml
+k8s.app/
+│   ├── fastapi-deployment.yaml
+│   ├── fastapi-service.yaml
+│   ├── postgres-deployment.yaml
+│   ├── postgres-service.yaml
+│   └── postgres-pvc.yaml
+│   └── ingress.yaml
+.env
+database.py
+docker-compose.yaml
+dockerfile
+README.md
+```
+
+### 2. Jenkinsfile
 
 ``` 
 pipeline {
@@ -178,7 +213,7 @@ pipeline {
 
 ``` 
 
-### 2. Connect Databese
+### 3. Connect Databese
 
 ``` 
 kubectl get pods
@@ -280,17 +315,33 @@ iPhone,64.0,4.0,6.1,3110.0,12.0,12.0,12.0,0.0,0.0,11.199
   "rc7": 0.0
 }
 ```
+
+### 4. Delete
+
+```
 kubectl get pods -n prod
+```
 
+```
 kubectl get svc -n prod
+```
 
+```
 kubectl get deployments -n prod
+```
 
+```
 kubectl get ingress -n prod
+```
 
+
+```
 kubectl delete all --all -n prod
+```
 
+```
 kubectl delete all --all -n test
+```
 
 
 
