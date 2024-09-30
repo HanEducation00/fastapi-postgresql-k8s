@@ -2,12 +2,14 @@ import os
 from dotenv import load_dotenv
 from sqlmodel import create_engine, SQLModel, Session
 
-import os
+load_dotenv()  # take environment variables from .env.
+SQLALCHEMY_DATABASE_URL = os.getenv('SQLALCHEMY_DATABASE_URL')
+# print(SQLALCHEMY_DATABASE_URL)
 
-env = os.getenv("ENV", "prod")  # Varsayılan olarak 'prod' al
-db_name = "test_db" if env == "test" else "prod_db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://postgres:postgres@postgres.svc.cluster.local/{db_name}"
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
 
 
 #Veritabanı bilgilerini geri döndürmemiz gerekiyor kayıt için.
